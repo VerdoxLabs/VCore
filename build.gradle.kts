@@ -9,16 +9,6 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1" apply true
 }
 
-group = "de.verdox.vcore"
-version = "1.0"
-description = "VCore"
-
-
-publishing {
-    publications.create<MavenPublication>("maven").from(components["java"]);
-    repositories.maven(repositories.mavenLocal())
-}
-
 tasks.test {
     useJUnitPlatform()
 }
@@ -31,6 +21,8 @@ allprojects {
     java {
         // Configure the java toolchain. This allows gradle to auto-provision JDK 17 on systems that only have JDK 8 installed for example.
         toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+        withSourcesJar()
+        withJavadocJar()
     }
 
     repositories {
@@ -38,6 +30,10 @@ allprojects {
         mavenCentral()
         maven {
             url = uri("https://papermc.io/repo/repository/maven-public/")
+        }
+        maven {
+            name = "Verdox Reposilite"
+            url = uri("https://repo.verdox.de/snapshots")
         }
 
         maven {
@@ -53,8 +49,8 @@ allprojects {
     }
 
     dependencies {
-        implementation("de.verdox.vpipeline:VPipeline:+")
-        implementation("de.verdox.vserializer:vserializer:+")
+        implementation("de.verdox:vpipeline:1.0.4-SNAPSHOT")
+        implementation("de.verdox:vserializer:1.0.5-SNAPSHOT")
         compileOnly("org.jetbrains:annotations:24.1.0")
         //paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
         //compileOnly("de.verdox.vcore:VCore:1.0:all")
@@ -73,8 +69,8 @@ allprojects {
         testImplementation("org.mockito:mockito-core:5.5.0")
         testImplementation("org.ow2.asm:asm-tree:9.5")
 
-        testImplementation("de.verdox.vpipeline:VPipeline:+")
-        testImplementation("de.verdox.vserializer:vserializer:+")
+        testImplementation("de.verdox:vpipeline:1.0.4-SNAPSHOT")
+        testImplementation("de.verdox:vserializer:1.0.5-SNAPSHOT")
         testImplementation("com.github.kstyrc:embedded-redis:0.6")
         testImplementation("org.jetbrains:annotations:24.1.0")
     }
@@ -113,6 +109,36 @@ allprojects {
 
         processResources {
             filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
+        }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            pom {
+                groupId = "de.verdox.vcore"
+                artifactId = "core"
+                version = "1.0.0-SNAPSHOT"
+                from(components["java"])
+                developers {
+                    developer {
+                        id = "verdox"
+                        name = "Lukas Jonsson"
+                        email = "mail.ysp@web.de"
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "verdox"
+            url = uri("https://repo.verdox.de/snapshots")
+            credentials {
+                username = (findProperty("reposilite.verdox.user") ?: System.getenv("REPO_USER")).toString()
+                password = (findProperty("reposilite.verdox.key") ?: System.getenv("REPO_PASSWORD")).toString()
+            }
         }
     }
 }

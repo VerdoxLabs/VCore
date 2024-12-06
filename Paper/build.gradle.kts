@@ -2,10 +2,6 @@ plugins {
     id("java")
 }
 
-group = "de.verdox.vcore"
-version = "1.0"
-description = "paper"
-
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
@@ -40,6 +36,31 @@ tasks.test {
 }
 
 publishing {
-    publications.create<MavenPublication>("maven").from(components["java"]);
-    repositories.maven(repositories.mavenLocal())
+    publications {
+        create<MavenPublication>("maven") {
+            pom {
+                groupId = "de.verdox.vcore"
+                artifactId = "paper"
+                version = "1.0.0-SNAPSHOT"
+                from(components["java"])
+                developers {
+                    developer {
+                        id = "verdox"
+                        name = "Lukas Jonsson"
+                        email = "mail.ysp@web.de"
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "verdox"
+            url = uri("https://repo.verdox.de/snapshots")
+            credentials {
+                username = (findProperty("reposilite.verdox.user") ?: System.getenv("REPO_USER")).toString()
+                password = (findProperty("reposilite.verdox.key") ?: System.getenv("REPO_PASSWORD")).toString()
+            }
+        }
+    }
 }
