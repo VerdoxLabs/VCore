@@ -49,8 +49,8 @@ allprojects {
     }
 
     dependencies {
-        implementation("de.verdox:vpipeline:1.0.4-SNAPSHOT")
-        implementation("de.verdox:vserializer:1.0.5-SNAPSHOT")
+        compileOnly("de.verdox:vpipeline:+")
+        compileOnly("de.verdox:vserializer:+")
         compileOnly("org.jetbrains:annotations:24.1.0")
         //paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
         //compileOnly("de.verdox.vcore:VCore:1.0:all")
@@ -69,8 +69,8 @@ allprojects {
         testImplementation("org.mockito:mockito-core:5.5.0")
         testImplementation("org.ow2.asm:asm-tree:9.5")
 
-        testImplementation("de.verdox:vpipeline:1.0.4-SNAPSHOT")
-        testImplementation("de.verdox:vserializer:1.0.5-SNAPSHOT")
+        testImplementation("de.verdox:vpipeline:+")
+        testImplementation("de.verdox:vserializer:+")
         testImplementation("com.github.kstyrc:embedded-redis:0.6")
         testImplementation("org.jetbrains:annotations:24.1.0")
     }
