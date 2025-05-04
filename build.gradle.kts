@@ -1,6 +1,7 @@
 plugins {
     java
     `maven-publish`
+    id("java-library")
 
     // Nothing special about this, just keep it up to date
     //id("com.github.johnrengelman.shadow") version "8.1.1" apply false
@@ -58,7 +59,6 @@ allprojects {
         //compileOnly("net.dv8tion:JDA:5.0.0-alpha.22")
         //compileOnly("io.lumine:Mythic-Dist:5.2.1")
         //compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
-        compileOnly("com.mojang:authlib:3.2.38")
         //implementation("com.github.zlataovce:takenaka:efa1b99173")
         compileOnly("com.jamieswhiteshirt:rtree-3i-lite:0.3.0")
         compileOnly("org.apache.commons:commons-collections4:4.4")

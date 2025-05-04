@@ -1,46 +1,160 @@
-package de.verdox.vcore.paper.serializer;
+package de.verdox.vcore.paper.serializer.pdc;
 
+import de.verdox.vcore.paper.serializer.PDCSerializationContext;
 import de.verdox.vserializer.blank.BlankSerializationArray;
-import de.verdox.vserializer.blank.BlankSerializationContext;
+import de.verdox.vserializer.blank.BlankSerializationPrimitive;
 import de.verdox.vserializer.generic.*;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.ListPersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
+import java.util.Collection;
 
-public class PDCSerializationContext extends BlankSerializationContext {
+public class PDCSerializationContainer extends PDCSerializationElement implements SerializationContainer {
     private static final NamespacedKey ARRAY_MARKER = new NamespacedKey("array", "array_marker");
-    private static final NamespacedKey STANDARD_KEY = new NamespacedKey("mcc", "pdc");
 
-    public static final PDCSerializationContext INSTANCE = new PDCSerializationContext();
+    public PDCSerializationContainer(String namespace, PersistentDataContainer parent, PDCSerializationContext pdcSerializationContainer) {
+        super(namespace, parent, pdcSerializationContainer);
+    }
 
-    private PDCSerializationContext(){
+    @Override
+    public Collection<String> getChildKeys() {
+        return parent.getKeys().stream().filter(namespacedKey -> namespacedKey.namespace().equals(namespace)).map(NamespacedKey::getKey).toList();
+    }
+
+    @Override
+    public @NotNull SerializationElement get(String s) {
+        return deserializeFromPDC(new NamespacedKey(namespace, s), parent);
+    }
+
+    @Override
+    public boolean contains(String s) {
+        return false;
+    }
+
+    @Override
+    public void set(String s, SerializationElement serializationElement) {
 
     }
 
-    public <T> void serializeToPDC(Serializer<T> serializer, T object, PersistentDataContainer parent) {
-        serializeToPDC(serializer, object, STANDARD_KEY, parent);
+    @Override
+    public void remove(String s) {
+
     }
 
-    public <T> void serializeToPDC(Serializer<T> serializer, T object, NamespacedKey key, PersistentDataContainer parent) {
-        SerializationElement element = serializer.serialize(this, object);
-        serializeToPDC(element, key, parent);
+    @Override
+    public boolean getAsBoolean() {
+        return false;
     }
 
-    public <T> T deserializeFromPDC(Serializer<T> serializer, NamespacedKey key, PersistentDataContainer parent) {
-        return serializer.deserialize(deserializeFromPDC(key, parent));
+    @Override
+    public String getAsString() {
+        return "";
     }
 
-    public <T> T deserializeFromPDC(Serializer<T> serializer, PersistentDataContainer parent) {
-        return deserializeFromPDC(serializer, STANDARD_KEY, parent);
+    @Override
+    public char getAsCharacter() {
+        return 0;
+    }
+
+    @Override
+    public Number getAsNumber() {
+        return null;
+    }
+
+    @Override
+    public double getAsDouble() {
+        return 0;
+    }
+
+    @Override
+    public float getAsFloat() {
+        return 0;
+    }
+
+    @Override
+    public long getAsLong() {
+        return 0;
+    }
+
+    @Override
+    public int getAsInt() {
+        return 0;
+    }
+
+    @Override
+    public short getAsShort() {
+        return 0;
+    }
+
+    @Override
+    public byte getAsByte() {
+        return 0;
+    }
+
+    @Override
+    public SerializationContext getContext() {
+        return null;
+    }
+
+    public SerializationElement deserializeFromPDC(NamespacedKey key, PersistentDataContainer parent) {
+        if (parent.has(key, PersistentDataType.BOOLEAN)) {
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.BOOLEAN));
+        }
+        if (parent.has(key, PersistentDataType.STRING)) {
+            String value = parent.get(key, PersistentDataType.BooleanPersistentDataType.STRING);
+            if ("null".equals(value)) {
+                return pdcSerializationContext.createNull();
+            }
+            return pdcSerializationContext.create(value);
+        } else if (parent.has(key, PersistentDataType.BYTE))
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.BYTE));
+        else if (parent.has(key, PersistentDataType.SHORT))
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.SHORT));
+        else if (parent.has(key, PersistentDataType.INTEGER))
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.INTEGER));
+        else if (parent.has(key, PersistentDataType.LONG))
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.LONG));
+        else if (parent.has(key, PersistentDataType.FLOAT))
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.FLOAT));
+        else if (parent.has(key, PersistentDataType.DOUBLE))
+            return pdcSerializationContext.create(parent.get(key, PersistentDataType.BooleanPersistentDataType.DOUBLE));
+        else if (parent.has(key, ListPersistentDataType.BYTE))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.bytes(),  SerializationElement::getAsByte, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.SHORT))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.shorts(),  SerializationElement::getAsShort, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.INTEGER))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.integers(),  SerializationElement::getAsInt, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.LONG))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.longs(),  SerializationElement::getAsLong, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.FLOAT))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.floats(),  SerializationElement::getAsFloat, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.DOUBLE))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.doubles(),  SerializationElement::getAsDouble, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.BOOLEAN))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.booleans(),  SerializationElement::getAsBoolean, BlankSerializationPrimitive::new);
+        else if (parent.has(key, ListPersistentDataType.STRING))
+            return new PDCSerializationArray<>(key, parent, pdcSerializationContext, PersistentDataType.LIST.strings(),  SerializationElement::getAsString, BlankSerializationPrimitive::new);
+        else if (parent.has(key, PersistentDataType.TAG_CONTAINER)) {
+            PersistentDataContainer pdc = parent.get(key, PersistentDataType.TAG_CONTAINER);
+/*            if (pdc.has(ARRAY_MARKER, PersistentDataType.BOOLEAN)) {
+                SerializationArray array = pdcSerializationContext.createArray();
+                for (NamespacedKey pdcKey : pdc.getKeys()) {
+                    if (pdcKey.equals(ARRAY_MARKER))
+                        continue;
+
+                    SerializationElement element = deserializeFromPDC(pdcKey, pdc);
+                    array.add(element);
+                }
+                return array;
+            } else {*/
+                return new PDCSerializationContainer(key.namespace(), pdc, pdcSerializationContext);
+            //}
+        } else
+            return pdcSerializationContext.createNull();
     }
 
     public void serializeToPDC(SerializationElement element, NamespacedKey key, PersistentDataContainer parent) {
@@ -56,74 +170,6 @@ public class PDCSerializationContext extends BlankSerializationContext {
         }
     }
 
-    public void serializeToPDC(SerializationElement element, PersistentDataContainer parent) {
-        serializeToPDC(element, STANDARD_KEY, parent);
-    }
-
-    public SerializationElement deserializeFromPDC(NamespacedKey key, PersistentDataContainer parent) {
-        if (parent.has(key, PersistentDataType.BOOLEAN))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.BOOLEAN));
-        if (parent.has(key, PersistentDataType.STRING)) {
-            String value = parent.get(key, PersistentDataType.BooleanPersistentDataType.STRING);
-            if ("null".equals(value))
-                return createNull();
-            return create(value);
-        } else if (parent.has(key, PersistentDataType.BYTE))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.BYTE));
-        else if (parent.has(key, PersistentDataType.SHORT))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.SHORT));
-        else if (parent.has(key, PersistentDataType.INTEGER))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.INTEGER));
-        else if (parent.has(key, PersistentDataType.LONG))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.LONG));
-        else if (parent.has(key, PersistentDataType.FLOAT))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.FLOAT));
-        else if (parent.has(key, PersistentDataType.DOUBLE))
-            return create(parent.get(key, PersistentDataType.BooleanPersistentDataType.DOUBLE));
-        else if (parent.has(key, ListPersistentDataType.BYTE))
-            return BlankSerializationArray.byNumbers(this, parent.get(key, PersistentDataType.LIST.bytes()));
-        else if (parent.has(key, ListPersistentDataType.SHORT))
-            return BlankSerializationArray.byNumbers(this, parent.get(key, PersistentDataType.LIST.shorts()));
-        else if (parent.has(key, ListPersistentDataType.INTEGER))
-            return BlankSerializationArray.byNumbers(this, parent.get(key, PersistentDataType.LIST.integers()));
-        else if (parent.has(key, ListPersistentDataType.LONG))
-            return BlankSerializationArray.byNumbers(this, parent.get(key, PersistentDataType.LIST.longs()));
-        else if (parent.has(key, ListPersistentDataType.FLOAT))
-            return BlankSerializationArray.byNumbers(this, parent.get(key, PersistentDataType.LIST.floats()));
-        else if (parent.has(key, ListPersistentDataType.DOUBLE))
-            return BlankSerializationArray.byNumbers(this, parent.get(key, PersistentDataType.LIST.doubles()));
-        else if (parent.has(key, ListPersistentDataType.BOOLEAN))
-            return BlankSerializationArray.byBooleans(this, parent.get(key, PersistentDataType.LIST.booleans()));
-        else if (parent.has(key, ListPersistentDataType.STRING))
-            return BlankSerializationArray.byStrings(this, parent.get(key, PersistentDataType.LIST.strings()));
-        else if (parent.has(key, PersistentDataType.TAG_CONTAINER)) {
-            PersistentDataContainer pdc = parent.get(key, PersistentDataType.TAG_CONTAINER);
-            if (pdc.has(ARRAY_MARKER, PersistentDataType.BOOLEAN)) {
-                SerializationArray array = createArray();
-                for (NamespacedKey pdcKey : pdc.getKeys()) {
-                    if (pdcKey.equals(ARRAY_MARKER))
-                        continue;
-
-                    SerializationElement element = deserializeFromPDC(pdcKey, pdc);
-                    array.add(element);
-                }
-                return array;
-            } else {
-                SerializationContainer container = createContainer();
-                for (NamespacedKey pdcKey : pdc.getKeys()) {
-                    SerializationElement element = deserializeFromPDC(pdcKey, pdc);
-                    container.set(pdcKey.value(), element);
-                }
-                return container;
-            }
-        } else
-            return createNull();
-    }
-
-    public SerializationElement deserializeFromPDC(PersistentDataContainer parent) {
-        return deserializeFromPDC(STANDARD_KEY, parent);
-    }
-
     private void serializeContainerToPDC(SerializationElement element, NamespacedKey key, PersistentDataContainer parent) {
         SerializationContainer container = element.getAsContainer();
         PersistentDataContainer newPDC = parent.getAdapterContext().newPersistentDataContainer();
@@ -135,7 +181,7 @@ public class PDCSerializationContext extends BlankSerializationContext {
     }
 
     private void serializeArrayToPDC(SerializationElement element, NamespacedKey key, PersistentDataContainer parent) {
-        SerializationArray array = element.getAsArray();
+        /*SerializationArray array = element.getAsArray();
 
         if (array.isBoolArray())
             parent.set(key, ListPersistentDataType.LIST.booleans(), toList(array.getAsBooleanArray()));
@@ -172,7 +218,7 @@ public class PDCSerializationContext extends BlankSerializationContext {
                 counter++;
             }
             parent.set(key, PersistentDataType.TAG_CONTAINER, childPDC);
-        }
+        }*/
     }
 
     private static void serializePrimitiveToPDC(NamespacedKey key, PersistentDataContainer parent, SerializationPrimitive primitive) {
@@ -192,51 +238,5 @@ public class PDCSerializationContext extends BlankSerializationContext {
             parent.set(key, PersistentDataType.FLOAT, primitive.getAsFloat());
         else if (primitive.isDouble())
             parent.set(key, PersistentDataType.DOUBLE, primitive.getAsDouble());
-    }
-
-    public static List<Integer> toList(int[] array) {
-        return IntStream.of(array).boxed().collect(Collectors.toList());
-    }
-
-    public static List<Double> toList(double[] array) {
-        return DoubleStream.of(array).boxed().collect(Collectors.toList());
-    }
-
-    public static List<Long> toList(long[] array) {
-        return LongStream.of(array).boxed().collect(Collectors.toList());
-    }
-
-    public static List<Float> toList(float[] array) {
-        List<Float> list = new ArrayList<>();
-        for (float v : array) {
-            list.add(v);
-        }
-        return list;
-    }
-
-    public static List<Boolean> toList(boolean[] array) {
-        List<Boolean> list = new ArrayList<>();
-        for (boolean v : array) {
-            list.add(v);
-        }
-        return list;
-    }
-
-    public static List<Character> toList(char[] array) {
-        return IntStream.range(0, array.length)
-                .mapToObj(i -> array[i])
-                .collect(Collectors.toList());
-    }
-
-    public static List<Byte> toList(byte[] array) {
-        return IntStream.range(0, array.length)
-                .mapToObj(i -> array[i])
-                .collect(Collectors.toList());
-    }
-
-    public static List<Short> toList(short[] array) {
-        return IntStream.range(0, array.length)
-                .mapToObj(i -> array[i])
-                .collect(Collectors.toList());
     }
 }

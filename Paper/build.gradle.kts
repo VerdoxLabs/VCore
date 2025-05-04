@@ -13,11 +13,9 @@ apply {
 }
 
 dependencies {
-    compileOnly("de.verdox.mccreativelab:mccreativelab-api:1.21-R0.1-SNAPSHOT")
-    compileOnly("de.verdox.mccreativelab:plugin-extension:1.0")
+    compileOnly("io.papermc.paper:paper-api:1.21.5-R0.1-SNAPSHOT")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("com.github.MockBukkit:MockBukkit:v1.21-SNAPSHOT")
     implementation(rootProject)
 }
 

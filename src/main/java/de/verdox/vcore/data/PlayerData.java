@@ -11,15 +11,16 @@ import java.util.UUID;
  */
 public abstract class PlayerData<P> extends PipelineData {
     private transient P player;
+
     public PlayerData(@NotNull Pipeline pipeline, @NotNull UUID objectUUID) {
         super(pipeline, objectUUID);
     }
 
-    public final void attach(P player){
+    public final void attach(P player) {
         this.player = player;
     }
 
-    public final void detach(){
+    public final void detach() {
 
     }
 }
