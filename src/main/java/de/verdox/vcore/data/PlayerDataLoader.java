@@ -56,7 +56,7 @@ public class PlayerDataLoader<P> {
 
     @Nullable
     public <T extends PlayerData<P>, RETURN> RETURN readOnly(Class<T> type, UUID playerUUID, Function<T, RETURN> readOnly) {
-        if (dataAccessMap.containsKey(playerUUID)) {
+        if (!dataAccessMap.containsKey(playerUUID)) {
             throw new IllegalArgumentException("No data found for player " + playerUUID);
         }
         Data<P, T> data = (Data<P, T>) dataAccessMap.get(playerUUID).getOrDefault(type, null);
@@ -75,7 +75,7 @@ public class PlayerDataLoader<P> {
     }
 
     public <T extends PlayerData<P>> void write(Class<T> type, UUID playerUUID, Consumer<T> writeAction) {
-        if (dataAccessMap.containsKey(playerUUID)) {
+        if (!dataAccessMap.containsKey(playerUUID)) {
             throw new IllegalArgumentException("No data found for player " + playerUUID);
         }
         Data<P, T> data = (Data<P, T>) dataAccessMap.get(playerUUID).getOrDefault(type, null);
