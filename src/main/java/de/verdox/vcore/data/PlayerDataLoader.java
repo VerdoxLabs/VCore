@@ -9,6 +9,7 @@ import de.verdox.vpipeline.api.pipeline.parts.cache.local.LockableAction;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,12 +64,36 @@ public class PlayerDataLoader<P> {
             LOGGER.log(Level.SEVERE, "Data not registered to PlayerDataLoader " + type.getSimpleName());
             return null;
         }
+        if (data.dataAccess().killed()) {
+            return null;
+        }
         T current = data.readOnlyAccess.getCurrentValue();
         if (current == null) {
             return null;
         }
         return readOnly.apply(current);
     }
+
+    public <T extends PlayerData<P>> void write(Class<T> type, UUID playerUUID, Consumer<T> writeAction) {
+        if (dataAccessMap.containsKey(playerUUID)) {
+            throw new IllegalArgumentException("No data found for player " + playerUUID);
+        }
+        Data<P, T> data = (Data<P, T>) dataAccessMap.get(playerUUID).getOrDefault(type, null);
+        if (data == null) {
+            LOGGER.log(Level.SEVERE, "Data not registered to PlayerDataLoader " + type.getSimpleName());
+            return;
+        }
+        if (data.dataAccess().killed()) {
+            return;
+        }
+        try(var write = data.dataAccess.write()) {
+            writeAction.accept(write.get());
+            write.commitChanges(true);
+        } catch (AccessInvalidException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     private <T extends PlayerData<P>> boolean saveAndClean(Class<T> type, UUID playerUUID) {
         Data<P, T> data = (Data<P, T>) dataAccessMap.get(playerUUID).getOrDefault(type, null);
