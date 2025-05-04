@@ -59,11 +59,12 @@ public class PlayerDataLoader<P> {
             throw new IllegalArgumentException("No data found for player " + playerUUID);
         }
         Data<P, T> data = (Data<P, T>) dataAccessMap.get(playerUUID).getOrDefault(type, null);
-        if(data == null) {
+        if (data == null) {
+            LOGGER.log(Level.SEVERE, "Data not registered to PlayerDataLoader " + type.getSimpleName());
             return null;
         }
         T current = data.readOnlyAccess.getCurrentValue();
-        if(current == null) {
+        if (current == null) {
             return null;
         }
         return readOnly.apply(current);
