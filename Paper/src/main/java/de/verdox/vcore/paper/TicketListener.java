@@ -33,7 +33,7 @@ public class TicketListener implements Listener {
     }
 
     @EventHandler
-    public void consumeTicketsOnJoin(PlayerJoinEvent e) {
+    public void consumeTicketsOnJoin(PlayerClientLoadedWorldEvent e) {
         if(!potential.contains(e.getPlayer().getUniqueId())) {
             return;
         }
