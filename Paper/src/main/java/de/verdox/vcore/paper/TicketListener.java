@@ -25,6 +25,6 @@ public class TicketListener implements Listener {
     public void consumeTicketsOnJoin(PlayerJoinEvent e) {
         Bukkit.getScheduler().runTaskLater(javaPlugin, () -> {
             networkParticipant.messagingService().getTicketPropagator().consumeTicketGroup(PlayerConnectionTicket.class, e.getPlayer());
-        });
+        }, 20L);
     }
 }
