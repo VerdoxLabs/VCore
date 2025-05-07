@@ -1,6 +1,7 @@
 package de.verdox.vcore.paper;
 
 import de.verdox.vpipeline.api.NetworkParticipant;
+import io.papermc.paper.event.player.PlayerClientLoadedWorldEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -17,7 +18,7 @@ public class TicketListener implements Listener {
         networkParticipant.messagingService().getTicketPropagator().triggerTicketDataPreloadGroup(PlayerConnectionTicket.class);
     }
     @EventHandler
-    public void consumeTicketsOnJoin(PlayerJoinEvent e) {
+    public void consumeTicketsOnJoin(PlayerClientLoadedWorldEvent e) {
         networkParticipant.messagingService().getTicketPropagator().consumeTicketGroup(PlayerConnectionTicket.class, e.getPlayer());
     }
 }
