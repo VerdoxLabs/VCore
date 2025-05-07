@@ -10,7 +10,7 @@ public class VCorePaper {
         VPipelineDependencyLoader.load(pluginClasspathBuilder);
     }
     public static void enableListeners(JavaPlugin javaPlugin, NetworkParticipant networkParticipant){
-        TicketListener ticketListener = new TicketListener(networkParticipant);
+        TicketListener ticketListener = new TicketListener(javaPlugin, networkParticipant);
         Bukkit.getPluginManager().registerEvents(ticketListener, javaPlugin);
     }
 }
