@@ -2,6 +2,7 @@ package de.verdox.vcore.paper.serializer;
 
 import de.verdox.vserializer.blank.BlankSerializationArray;
 import de.verdox.vserializer.blank.BlankSerializationContext;
+import de.verdox.vserializer.exception.SerializationException;
 import de.verdox.vserializer.generic.*;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.ListPersistentDataType;
@@ -26,20 +27,20 @@ public class PDCSerializationContext extends BlankSerializationContext {
 
     }
 
-    public <T> void serializeToPDC(Serializer<T> serializer, T object, PersistentDataContainer parent) {
+    public <T> void serializeToPDC(Serializer<T> serializer, T object, PersistentDataContainer parent) throws SerializationException {
         serializeToPDC(serializer, object, STANDARD_KEY, parent);
     }
 
-    public <T> void serializeToPDC(Serializer<T> serializer, T object, NamespacedKey key, PersistentDataContainer parent) {
+    public <T> void serializeToPDC(Serializer<T> serializer, T object, NamespacedKey key, PersistentDataContainer parent) throws SerializationException {
         SerializationElement element = serializer.serialize(this, object);
         serializeToPDC(element, key, parent);
     }
 
-    public <T> T deserializeFromPDC(Serializer<T> serializer, NamespacedKey key, PersistentDataContainer parent) {
+    public <T> T deserializeFromPDC(Serializer<T> serializer, NamespacedKey key, PersistentDataContainer parent) throws SerializationException {
         return serializer.deserialize(deserializeFromPDC(key, parent));
     }
 
-    public <T> T deserializeFromPDC(Serializer<T> serializer, PersistentDataContainer parent) {
+    public <T> T deserializeFromPDC(Serializer<T> serializer, PersistentDataContainer parent) throws SerializationException {
         return deserializeFromPDC(serializer, STANDARD_KEY, parent);
     }
 
